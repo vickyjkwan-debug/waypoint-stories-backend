@@ -1,26 +1,32 @@
 name: CI
 
 on:
-    push:
-        branches: [ main ]
-    pull_request:
-        branches: [ main ]
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-    build:
-        runs-on: macos-latest
+  build:
+    runs-on: macos-latest
 
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v3
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-          - name: Set up Swift
-            uses: swift-actions/setup-swift@v1
-            with:
-              swift-version: '5.8.1'
+      - name: Set up Swift
+        uses: swift-actions/setup-swift@v1
+        with:
+          swift-version: '5.8.1'
 
-          - name: Build
-            run: swift build --build-tests
+      - name: Install SwiftFormat
+        run: brew install swiftformat
 
-          - name: Run Tests
-            run: swift test
+      - name: Check SwiftFormat (fail if unformatted)
+        run: swiftformat . --lint --verbose --strict
+
+      - name: Build
+        run: swift build --build-tests
+
+      - name: Run Tests
+        run: swift test
